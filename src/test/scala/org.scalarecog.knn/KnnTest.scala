@@ -15,10 +15,9 @@ class KnnTest extends FlatSpec with ShouldMatchers {
   "2nn" should " classify correctly with a sample near two well-known labelled items" in {
     val alg = new Knn(2,
           List((3, "ok"), (18, "ok"), (21, "high"), (64, "high")),
-          (i : (Int, String)) => i._2,
-          (i1: (Int, String), i2: (Int, String)) => abs(i1._1 - i2._1))
+          (i1: Int, i2 : Int) => abs(i1 - i2))
 
-    val classified = alg.classify((4, ""))
+    val classified = alg.classify(4)
 
     classified should equal ("ok")
   }
@@ -27,8 +26,7 @@ class KnnTest extends FlatSpec with ShouldMatchers {
     evaluating {
        val alg = new Knn(-2,
           List((3, "ok"), (18, "ok"), (21, "high"), (64, "high")),
-          (i : (Int, String)) => i._2,
-          (i1: (Int, String), i2: (Int, String)) => abs(i1._1 - i2._1))
+          (i1: Int, i2 : Int) => abs(i1 - i2))
     } should produce [IllegalArgumentException]
   }
 }
