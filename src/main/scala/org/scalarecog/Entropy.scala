@@ -7,13 +7,21 @@ package org.scalarecog
 
 import scala.math._
 
+class Entropy[Data,Property](getProperty : Data => Property) {
+
+  def apply(dataset : List[Data]) : Double =
+    dataset.groupBy(getProperty).values
+      .map(i => i.length.toDouble / dataset.length)
+      .map(p => - p * log10(p) / log10(2))
+      .sum
+}
+
 /*
  * Shannon Entropy
  */
 object Entropy {
 
-  def apply[Data,Property](dataset : List[Data])(implicit getProperty : Data => Property) : Double =
-    dataset.groupBy(getProperty).values
-      .map(i => i.length / dataset.length)
-      .map(p => - p * log10(p) / log10(2)).sum
+  def apply[Data](dataset : List[Data]) : Double =
+    new Entropy[Data, Data](identity[Data])(dataset)
 }
+
