@@ -27,16 +27,17 @@ class ID3Test extends FlatSpec with ShouldMatchers {
 
   it should " work with boolean vectors" in {
     val dataset  =   (Vector(true, false), "Cat") ::
-                     // (Vector(true, true),  "Dog") ::
+                     // this is inferred:
+                     //  (Vector(true, true),  "Cat") ::
                      (Vector(false, true), "Dog") ::
-                     (Vector(false, false), "Fish") :: Nil
+                     (Vector(false, false), "Dog") :: Nil
 
     val id3 = new ID3[Boolean,String]
     val tree = id3 buildTree dataset
 
     tree classify Vector(true, false) should equal ("Cat")
-    tree classify Vector(true,  true) should equal ("Dog")
+    tree classify Vector(true,  true) should equal ("Cat")
     tree classify Vector(false, true) should equal ("Dog")
-    tree classify Vector(false,false) should equal ("Fish")
+    tree classify Vector(false,false) should equal ("Dog")
   }
 }
