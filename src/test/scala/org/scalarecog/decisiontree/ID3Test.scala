@@ -1,12 +1,9 @@
 package org.scalarecog.decisiontree
 
 /**
- * Created by IntelliJ IDEA.
- * User: onofrio
+ * User: onofrio.panzarino@gmail.com
  * Date: 23/07/11
- * Time: 22.34
  */
-
 import org.scalatest._
 import org.scalatest.matchers._
 
@@ -28,5 +25,18 @@ class ID3Test extends FlatSpec with ShouldMatchers {
     ) should produce [IndexOutOfBoundsException]
   }
 
+  it should " work with boolean vectors" in {
+    val dataset  =   (Vector(true, false), "Cat") ::
+                     // (Vector(true, true),  "Dog") ::
+                     (Vector(false, true), "Dog") ::
+                     (Vector(false, false), "Fish") :: Nil
 
+    val id3 = new ID3[Boolean,String]
+    val tree = id3 buildTree dataset
+
+    tree classify Vector(true, false) should equal ("Cat")
+    tree classify Vector(true,  true) should equal ("Dog")
+    tree classify Vector(false, true) should equal ("Dog")
+    tree classify Vector(false,false) should equal ("Fish")
+  }
 }

@@ -1,10 +1,8 @@
 package org.scalarecog.decisiontree
 
 /**
- * Created by IntelliJ IDEA.
- * User: onofrio
+ * User: onofrio.panzarino@gmail.com
  * Date: 23/07/11
- * Time: 22.33
  */
 
 import org.scalatest._
