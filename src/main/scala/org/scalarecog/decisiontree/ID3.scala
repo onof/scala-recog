@@ -45,7 +45,7 @@ class ID3[Property, Label] {
                    }
        }
 
-     val features = (0 to dataset.head._1.length).toSet
+     val features = Range(0, dataset.head._1.length, 1).toSet
      buildTreeRecursive(dataset, features)
    }
 }

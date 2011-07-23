@@ -8,7 +8,6 @@ package org.scalarecog
 import org.scalatest._
 import org.scalatest.matchers._
 
-
 class EntropyTest extends FlatSpec with ShouldMatchers {
 
   implicit val getProperty : Int => Int = i => i
