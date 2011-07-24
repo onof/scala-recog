@@ -1,7 +1,7 @@
 package org.scalarecog.decisiontree
 
 import org.scalarecog.Entropy
-
+import org.scalarecog.Entropy._
 
 /**
  * User: onofrio.panzarino@gmail.com
@@ -11,12 +11,10 @@ import org.scalarecog.Entropy
 class ID3[Property, Label] {
    type Data = Vector[Property]
 
-   private val entropyCalc = new Entropy[(Data, Label), Label](g => g._2)
-
    private def indexWhereSplit(properties : Set[Int], dataset : List[(Data, Label)]) = {
      val entropies = for(i <- properties; // for each property
                          entropy = (for((pv, subDataSet) <- splitOnProperty(dataset, i))
-                                    yield (subDataSet.length / dataset.length.toDouble) * entropyCalc(subDataSet)
+                                    yield (subDataSet.length / dataset.length.toDouble) * subDataSet.entropy(_._2)
                                    ).sum // and sum the entropy of all of them
                      ) yield (entropy, i)
 

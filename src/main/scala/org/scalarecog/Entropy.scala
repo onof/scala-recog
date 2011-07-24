@@ -7,9 +7,11 @@ package org.scalarecog
 
 import scala.math._
 
-class Entropy[Data,Property](getProperty : Data => Property) {
+class Entropy[Data](dataset : List[Data]) {
 
-  def apply(dataset : List[Data]) : Double =
+  def entropy : Double = entropy[Data](identity[Data])
+
+  def entropy[Property](getProperty : Data => Property) : Double =
     dataset.groupBy(getProperty).values
       .map(i => i.length.toDouble / dataset.length)
       .map(p => - p * log10(p) / log10(2))
@@ -21,7 +23,7 @@ class Entropy[Data,Property](getProperty : Data => Property) {
  */
 object Entropy {
 
-  def apply[Data](dataset : List[Data]) : Double =
-    new Entropy[Data, Data](identity[Data])(dataset)
+  implicit def traversable2Entropy[Property](x : Traversable[Property]) =
+    new Entropy[Property](x.toList);
 }
 
