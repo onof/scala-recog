@@ -1,5 +1,7 @@
 package org.scalarecog.knn
 
+import org.scalarecog.Classifier
+
 /**
  * k-NN algorithm. It classify a sample, given a dataset of known elements
  *
@@ -14,6 +16,7 @@ class Knn[Data, Label,
   val dataset : List[(Data, Label)],
   val getDistance : (Data, Data) => Distance
 )
+extends Classifier[Data, Label]
 {
   if(k < 1)
     throw new scala.IllegalArgumentException("k must be positive")
