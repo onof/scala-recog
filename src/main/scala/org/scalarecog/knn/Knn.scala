@@ -37,3 +37,14 @@ extends Classifier[Data, Label]
     classification._1
   }
 }
+
+object Knn {
+
+  class KnnM[Data,Label] (data : List[(Data,Label)]) {
+    def toKnn[Distance <% Ordered[Distance]](k : Int, distance : (Data, Data) => Distance) =
+      new Knn[Data,Label,Distance](k, data, distance)
+  }
+
+  implicit def traversableToKnn[Data,Label](data : Traversable[(Data, Label)]) = new KnnM[Data,Label](data.toList)
+}
+

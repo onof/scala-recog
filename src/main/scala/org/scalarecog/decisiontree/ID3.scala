@@ -1,6 +1,5 @@
 package org.scalarecog.decisiontree
 
-import org.scalarecog.Entropy
 import org.scalarecog.Entropy._
 
 /**
