@@ -1,6 +1,6 @@
 package org.scalarecog.bayes
 
-import org.scalarecog.{FuzzyClassifier, Classifier}
+import org.scalarecog.Classifier
 
 /**
  * User: onofrio.panzarino@gmail.com
@@ -10,13 +10,13 @@ import org.scalarecog.{FuzzyClassifier, Classifier}
 class BayesClassifier[DataItem,Label](
                                       dataSet : List[(List[DataItem],Label)]
                                       )
-  extends FuzzyClassifier[List[DataItem],Label] {
+  extends Classifier[List[DataItem],Label] {
 
   type Data = List[DataItem]
 
   private val labels = dataSet groupBy(_._2) keys
 
-  private val items = dataSet.flatMap(_._1).length
+  private val items = dataSet.flatMap(_._1).toSet.size
 
   // to compute probability of every class
   private val labelsFrequency = dataSet groupBy(_._2) mapValues (_.length)
@@ -38,10 +38,13 @@ class BayesClassifier[DataItem,Label](
     ) groupBy (_._1) mapValues(_.groupBy (_._2) mapValues (_.length))
 
   private def conditionalProbability(label : Label, data : DataItem) : Double = {
-    val pMC = (itemFrequency.getOrElse(data, Map[Label,Int]()).getOrElse(label, 0).toDouble /
-               labelsPerItemFrequency.getOrElse(label, 0))
+    val pMC = itemFrequency.getOrElse(data, Map[Label,Int]()).get(label) match {
+      case Some(a : Int) => a.toDouble / labelsPerItemFrequency.getOrElse(label, 1)
+      case None => 0.0001
+    }
+
     val pC = (labelsFrequency.getOrElse(label, 0).toDouble / dataSetLength)
-    val pM = (itemFrequency(data).values.sum.toDouble / items)
+    val pM = (itemFrequency.getOrElse(data, Map[Label,Int](label -> 1)).values.sum.toDouble / items)
 
     pMC * pC / pM
   }
@@ -51,9 +54,9 @@ class BayesClassifier[DataItem,Label](
     itemProbabilities.foldLeft(1.0)(_ * _)
   }
 
-  def classifyFuzzy(data : Data) : (Label, Double) = {
+  def classify(data : Data) : Label = {
     val labelProbabilities = labels.map(l =>(l, conditionalProbability(l, data)))
-    labelProbabilities.reduceLeft((t1, t2) => if(t1._2 > t2._2) t1 else t2)
+    labelProbabilities.reduceLeft((t1, t2) => if(t1._2 > t2._2) t1 else t2)._1
   }
 }
 
