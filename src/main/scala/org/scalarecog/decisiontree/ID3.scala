@@ -7,6 +7,14 @@ import org.scalarecog.Entropy._
  * Date: 21/07/11
  */
 
+class DecisionBranchVector[Label, Property](
+  val index : Int,
+  branches :  Map[Property, DecisionTree[Vector[Property],Label]]
+)
+extends DecisionBranch[Vector[Property], Label,Property]( v => v(index), branches) {
+
+}
+
 class ID3[Property, Label] {
    type Data = Vector[Property]
 
@@ -37,7 +45,7 @@ class ID3[Property, Label] {
 
          case _ => {
                       val index = indexWhereSplit(properties, subset)
-                      new DecisionBranch[Data,Label,Property](d => d(index),
+                      new DecisionBranchVector[Label,Property](index,
                         splitOnProperty(subset, index).mapValues(ds => buildTreeRecursive(ds, properties - index)))
                    }
        }

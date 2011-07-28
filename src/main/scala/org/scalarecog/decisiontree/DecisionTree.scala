@@ -1,6 +1,8 @@
 package org.scalarecog.decisiontree
 
 import org.scalarecog.Classifier
+import tools.cmd.Property
+import javax.xml.crypto.Data
 
 /**
  * User: onofrio.panzarino@gmail.com
@@ -29,3 +31,4 @@ class DecisionBranch[Data,Label,Property](
 
   override def toString = branches.mkString("Branch(", ",", ")")
 }
+
