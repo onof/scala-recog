@@ -13,9 +13,7 @@ class ID3Test extends FlatSpec with ShouldMatchers {
 
     val dataset = (Vector(2), "Two") :: (Vector(1), "One") :: Nil
 
-    val id3 = new ID3[Int, String]
-
-    val tree = id3 buildTree dataset
+    val tree = ID3 buildTree dataset
 
     tree classify Vector(2) should equal("Two")
     tree classify Vector(1) should equal("One")
@@ -32,8 +30,7 @@ class ID3Test extends FlatSpec with ShouldMatchers {
                      (Vector(false, true), "Dog") ::
                      (Vector(false, false), "Dog") :: Nil
 
-    val id3 = new ID3[Boolean,String]
-    val tree = id3 buildTree dataset
+    val tree = ID3 buildTree dataset
 
     tree classify Vector(true, false) should equal ("Cat")
     tree classify Vector(true,  true) should equal ("Cat")

@@ -3,10 +3,11 @@ package org.scalarecog.bayes
 import org.scalarecog.Classifier
 
 /**
+ * Bayes classifier.
+ *
  * User: onofrio.panzarino@gmail.com
  * Date: 25/07/11
  */
-
 class BayesClassifier[DataItem,Label](
                                       dataSet : List[(List[DataItem],Label)]
                                       )
@@ -60,6 +61,10 @@ class BayesClassifier[DataItem,Label](
   }
 }
 
+/**
+ * Bayes classifier companion objects.
+ * It contains implicit conversions
+ */
 object BayesClassifier {
 
   class BayesClassifierM[DataItem,Label](l : Traversable[(List[DataItem],Label)]) {
