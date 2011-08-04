@@ -5,38 +5,15 @@ import org.scalatest.matchers.ShouldMatchers
 import scala.math._;
 import scalala.tensor.::
 import scalala.tensor.mutable._;
-import scalala.tensor.dense._;
+import scalala.tensor.dense._
+;
 
 /**
  * User: onofrio.panzarino@gmail.com
- * Date: 01/08/11
+ * Date: 04/08/11
  */
 
-/**
- *
- */
-class SigmoidTest extends FlatSpec with ShouldMatchers {
-
-  "Sigmoid " should " be 0.5 if applied to 0" in {
-    sigmoid(0) should equal (0.5)
-  }
-
-  it should " be between 0 and 1" in {
-    for (
-      k <- 1 until 2500;
-      kd = k*100000.0
-    )
-    {
-      sigmoid( kd) should { be <= (1.0) and be >= (0.5) }
-      sigmoid(-kd) should { be <= (0.5) and be >= (0.0) }
-    }
-  }
-}
-
-/**
- *
- */
-class GradientAscentTest extends FlatSpec with ShouldMatchers {
+class StochasticGradientAscentTest extends FlatSpec with ShouldMatchers {
 
   "SigmoidClassifier " should " classify in a well splitted dataset " in {
 
@@ -48,7 +25,9 @@ class GradientAscentTest extends FlatSpec with ShouldMatchers {
 
     val labels = DenseVectorCol.tabulate(trainingSet.numRows)(i => trainingSet(i, 2) > 0.0)
 
-    val trainer = new GradientAscentSigmoidTrainer(trainingSet, labels)
+    val ts = for ( i <- 0 until trainingSet.numRows ) yield (trainingSet(i, ::), labels(i))
+
+    val trainer = new StochasticGradientAscentTrainer(ts)
     val classifier = trainer train
 
     classifier.classify(Vector(1.0, 13, 14)) should equal(true)
