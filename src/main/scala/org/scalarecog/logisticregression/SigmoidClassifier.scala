@@ -7,7 +7,6 @@ package org.scalarecog.logisticregression
 
 import org.scalarecog.Classifier
 
-
 import scalala.tensor.mutable._;
 import scalala.tensor.dense._;
 import scalala.tensor.sparse._;
@@ -32,8 +31,8 @@ trait Trainer[Data] {
   def improveWeights(weights : VectorCol[Data]) : VectorCol[Data]
 }
 
-trait FixedIterationsTrainer extends Trainer[Double] {
-  val numIterations : Int
+trait FixedIterations extends Trainer[Double] {
+  val numIterations : Int = 500
 
   lazy val weights = {
     var w = startWeights
@@ -47,15 +46,15 @@ trait FixedIterationsTrainer extends Trainer[Double] {
 trait GradientAscent extends Trainer[Double] {
   type Data = Double
 
-  val alpha : Data
+  val alpha : Data = 0.001
   val trainingSet: Matrix[Data]
   val labels: VectorCol[Data]
-  val function : Function[VectorCol[Data], VectorCol[Data]]
+  val function : Function[Data, Data]
 
-  val startWeights: VectorCol[Data] = DenseVectorCol.ones[Data](trainingSet.numCols)
+  lazy val startWeights: VectorCol[Data] = DenseVectorCol.ones[Data](trainingSet.numCols)
 
   def improveWeights(weights : VectorCol[Data]) = {
-    val error = labels - function((trainingSet * weights))
+    val error = labels - ((trainingSet * weights) map function)
     weights + (trainingSet.t * error) * alpha
   }
 }
@@ -63,29 +62,20 @@ trait GradientAscent extends Trainer[Double] {
 trait SigmoidTrainer {
   val weights : VectorCol[Double]
 
+  val function : Function[Double, Double] = sigmoid
+
   def train = new SigmoidClassifier(weights)
-}
-
-class GradientAscentSigmoidTrainer (
-  val trainingSet: Matrix[Double],
-  val label1: VectorCol[Boolean],
-  val numIterations : Int = 500,
-  val alpha : Double = 0.001
-)
-extends GradientAscent with SigmoidTrainer with FixedIterationsTrainer
-{
-  val function : Function[VectorCol[Double], VectorCol[Double]] = v => v map sigmoid
-
-  val labels = label1.map(if(_) 1.0 else 0.0)
 }
 
 trait StochasticGradientAscent extends Trainer[Double] {
 
   val trainingSet : IndexedSeq[(VectorRow[Double], Boolean)]
-  def alpha(i : Int) : Double
+
+  def alpha(i : Int) : Double = 0.001
+
   val function : Function[Double, Double]
 
-  val startWeights: VectorCol[Double] = DenseVectorCol.ones[Double](trainingSet.head._1.length)
+  lazy val startWeights: VectorCol[Double] = DenseVectorCol.ones[Double](trainingSet.head._1.length)
 
   def improveWeights(weights : VectorCol[Double]) = {
 
@@ -104,21 +94,44 @@ trait StochasticGradientAscent extends Trainer[Double] {
   }
 }
 
+trait ImprovedStochasticGradientAscent extends StochasticGradientAscent {
+
+  protected var j : Int = 0
+  def fixedAlpha(j : Int)(i : Int) = 4/(1.0+j+i)+0.01
+
+  abstract override def alpha(i : Int) = fixedAlpha(j)(j)
+
+  abstract override def improveWeights(weights : VectorCol[Double]) = {
+    val w = super.improveWeights(weights)
+    j = j + 1
+    w
+  }
+}
+
 class StochasticGradientAscentTrainer
 (
   val trainingSet : IndexedSeq[(VectorRow[Double], Boolean)],
-  val numIterations : Int = 500
+  override val numIterations : Int = 500
 )
-extends StochasticGradientAscent with SigmoidTrainer with FixedIterationsTrainer
+extends StochasticGradientAscent with SigmoidTrainer with FixedIterations
 {
   private var j = 0
-  def alpha(i : Int) = 4/(1.0+j+i)+0.01
-
-  val function : Function[Double, Double] = sigmoid
+  override def alpha(i : Int) = 4/(1.0+j+i)+0.01
 
   override def improveWeights(weights : VectorCol[Double]) = {
     val w = super.improveWeights(weights)
     j = j + 1
     w
+  }
+}
+
+/**
+ * Provides implicit conversion for default values
+ */
+object SigmoidClassifier {
+
+  implicit def toSigmoidClassifierTrainer(ts: IndexedSeq[(VectorRow[Double], Boolean)]) =
+    new SigmoidTrainer with ImprovedStochasticGradientAscent with FixedIterations {
+      val trainingSet = ts
   }
 }
