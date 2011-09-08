@@ -59,6 +59,8 @@ class BayesClassifier[DataItem,Label](
     val labelProbabilities = labels.map(l =>(l, conditionalProbability(l, data)))
     labelProbabilities.reduceLeft((t1, t2) => if(t1._2 > t2._2) t1 else t2)._1
   }
+
+  def trainWith(data : List[DataItem], label : Label) = new BayesClassifier((data, label) :: dataSet)
 }
 
 /**
