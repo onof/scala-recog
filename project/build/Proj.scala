@@ -13,4 +13,8 @@ class MyProject(info: ProjectInfo) extends DefaultProject(info) {
   val scalala = "org.scalala" %% "scalala" % "1.0.0.RC2-SNAPSHOT"
 
 
+  override def managedStyle = ManagedStyle.Maven
+  val publishTo = "Sonatype Nexus Repository Manager" at "http://nexus.scala-tools.org/content/repositories/snapshots"
+
+  Credentials(Path.userHome / ".ivy2" / "scalatools", log)
 }
