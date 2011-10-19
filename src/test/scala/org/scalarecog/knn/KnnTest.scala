@@ -26,9 +26,11 @@ class KnnTest extends FlatSpec with ShouldMatchers {
 
   it should " throw if k is negative " in {
     evaluating {
-       new Knn(-2,
-          List((3, "ok"), (18, "ok"), (21, "high"), (64, "high")),
-          (i1: Int, i2 : Int) => abs(i1 - i2))
+       new Knn[Int, String, Int](-2,
+          List((3, "ok"), (18, "ok"), (21, "high"), (64, "high"))) {
+          def distance(i1: Int, i2 : Int) = abs(i1 - i2)
+       }
+
     } should produce [IllegalArgumentException]
 
     evaluating {
