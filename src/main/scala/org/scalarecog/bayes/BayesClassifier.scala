@@ -67,8 +67,8 @@ class BayesTrainer[DataItem,Label] extends SupervisedLearning[List[DataItem], La
  * Date: 25/07/11
  */
 class BayesClassifier[DataItem,Label](
-                                      labels : List[Label],
-                                      conditionalProbabilities : Map[(DataItem, Label), Double]
+                                      val labels : List[Label],
+                                      val conditionalProbabilities : Map[(DataItem, Label), Double]
                                       )
   extends Classifier[List[DataItem],Label] {
 
